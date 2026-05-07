@@ -1,0 +1,258 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "@fontsource-variable/inter";
+
+@custom-variant dark (&:is(.dark *));
+
+/* ---------- Optima Inventory Design Tokens ---------- */
+
+:root {
+  --background: 250 250 252;
+  --surface: 255 255 255;
+  --surface-elevated: 255 255 255;
+  --foreground: 15 23 42;
+  --muted: 100 116 139;
+  --muted-foreground: 71 85 105;
+  --border: 226 232 240;
+  --border-strong: 203 213 225;
+  --ring: 59 130 246;
+
+  --primary: 59 130 246;
+  --primary-foreground: 255 255 255;
+  --indigo: 99 102 241;
+  --navy: 11 18 32;
+
+  --emerald: 16 185 129;
+  --amber: 245 158 11;
+  --crimson: 244 63 94;
+
+  --ai-from: 168 85 247;
+  --ai-to: 236 72 153;
+
+  --radius: 0.9rem;
+
+  --shadow-soft: 0 1px 2px rgb(15 23 42 / 0.04), 0 8px 24px rgb(15 23 42 / 0.06);
+  --shadow-glass: 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 20px 60px rgb(2 6 23 / 0.45);
+}
+
+.dark {
+  --background: 6 11 22;
+  --surface: 13 18 32;
+  --surface-elevated: 18 24 40;
+  --foreground: 241 245 249;
+  --muted: 148 163 184;
+  --muted-foreground: 148 163 184;
+  --border: 30 41 59;
+  --border-strong: 51 65 85;
+  --ring: 99 102 241;
+
+  --primary: 99 102 241;
+  --primary-foreground: 255 255 255;
+  --indigo: 129 140 248;
+  --navy: 6 11 22;
+
+  --emerald: 52 211 153;
+  --amber: 251 191 36;
+  --crimson: 251 113 133;
+
+  --ai-from: 192 132 252;
+  --ai-to: 244 114 182;
+
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.6), 0 12px 40px rgb(0 0 0 / 0.45);
+  --shadow-glass: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 24px 80px rgb(0 0 0 / 0.55);
+}
+
+@theme inline {
+  --color-background: rgb(var(--background));
+  --color-surface: rgb(var(--surface));
+  --color-surface-elevated: rgb(var(--surface-elevated));
+  --color-foreground: rgb(var(--foreground));
+  --color-muted: rgb(var(--muted));
+  --color-muted-foreground: rgb(var(--muted-foreground));
+  --color-border: rgb(var(--border));
+  --color-border-strong: rgb(var(--border-strong));
+  --color-ring: rgb(var(--ring));
+
+  --color-primary: rgb(var(--primary));
+  --color-primary-foreground: rgb(var(--primary-foreground));
+  --color-indigo: rgb(var(--indigo));
+  --color-navy: rgb(var(--navy));
+
+  --color-emerald: rgb(var(--emerald));
+  --color-amber: rgb(var(--amber));
+  --color-crimson: rgb(var(--crimson));
+
+  --color-ai-from: rgb(var(--ai-from));
+  --color-ai-to: rgb(var(--ai-to));
+
+  --radius-sm: calc(var(--radius) - 0.25rem);
+  --radius-md: var(--radius);
+  --radius-lg: calc(var(--radius) + 0.25rem);
+  --radius-xl: calc(var(--radius) + 0.5rem);
+
+  --font-sans:
+    "Inter Variable", Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+  --font-display:
+    "Inter Variable", Inter, ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ---------- Base ---------- */
+
+* {
+  border-color: rgb(var(--border));
+}
+
+html,
+body,
+#root {
+  min-height: 100vh;
+}
+
+html {
+  background: rgb(var(--background));
+  color: rgb(var(--foreground));
+  color-scheme: light dark;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-synthesis: none;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgb(99 102 241 / 0.08), transparent 60%),
+    radial-gradient(900px 500px at 0% 100%, rgb(16 185 129 / 0.06), transparent 60%),
+    rgb(var(--background));
+}
+
+.dark body {
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgb(99 102 241 / 0.18), transparent 60%),
+    radial-gradient(900px 500px at 0% 100%, rgb(168 85 247 / 0.10), transparent 60%),
+    rgb(var(--background));
+}
+
+@layer base {
+  *:focus-visible {
+    outline: 2px solid rgb(var(--ring) / 0.7);
+    outline-offset: 2px;
+    border-radius: 0.4rem;
+  }
+
+  button:focus-visible,
+  [role="button"]:focus-visible,
+  a:focus-visible {
+    box-shadow: 0 0 0 4px rgb(var(--ring) / 0.18);
+  }
+
+  ::selection {
+    background: rgb(var(--primary) / 0.35);
+    color: rgb(var(--foreground));
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    letter-spacing: -0.02em;
+  }
+
+  .sr-only {
+    border: 0;
+    clip: rect(0 0 0 0);
+    height: 1px;
+    margin: -1px;
+    overflow: hidden;
+    padding: 0;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+  }
+
+  .skip-link {
+    background: rgb(var(--surface-elevated));
+    border: 1px solid rgb(var(--border-strong));
+    border-radius: var(--radius-md);
+    color: rgb(var(--foreground));
+    font-weight: 600;
+    left: 1rem;
+    padding: 0.6rem 1rem;
+    position: fixed;
+    top: 1rem;
+    transform: translateY(-200%);
+    transition: transform 180ms ease;
+    z-index: 100;
+  }
+
+  .skip-link:focus {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ---------- Utilities ---------- */
+
+@utility ai-gradient {
+  background-image: linear-gradient(135deg, rgb(var(--ai-from)), rgb(var(--ai-to)));
+}
+
+@utility ai-text {
+  background-image: linear-gradient(135deg, rgb(var(--ai-from)), rgb(var(--ai-to)));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@utility glass {
+  background: color-mix(in oklab, rgb(var(--surface)), transparent 30%);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(var(--border-strong)) transparent;
+}
+*::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgb(var(--border-strong));
+  border-radius: 999px;
+}
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Leaflet overrides for dark mode */
+.dark .leaflet-tile {
+  filter: brightness(0.7) contrast(1.1) saturate(0.8) hue-rotate(180deg) invert(1);
+}
+.leaflet-container {
+  background: rgb(var(--surface));
+  border-radius: var(--radius);
+}
