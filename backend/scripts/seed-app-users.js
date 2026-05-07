@@ -6,7 +6,7 @@ import { User } from "../models/user.model.js";
 
 dotenv.config();
 
-const defaultPassword = "123456789";
+const defaultPassword = process.env.DEFAULT_USER_PASSWORD || "123456789";
 const companyName = "Demo Company";
 
 async function upsertUser({ name, email, role, companyId, password }) {
@@ -19,8 +19,6 @@ async function upsertUser({ name, email, role, companyId, password }) {
         role,
         companyId: companyId || null,
         isVerified: true,
-      },
-      $setOnInsert: {
         password,
       },
     },
@@ -51,6 +49,12 @@ async function seed() {
     upsertUser({
       name: "Super Admin",
       email: "superadmin@gmail.com",
+      role: "SuperAdmin",
+      password,
+    }),
+    upsertUser({
+      name: "Romdhani Ahmed Rabiaa",
+      email: "romdhaniahmedrabiaa@gmail.com",
       role: "SuperAdmin",
       password,
     }),

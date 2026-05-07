@@ -33,7 +33,7 @@ const STATUS_TONE: Record<Inventory["status"], "amber" | "primary" | "emerald"> 
 };
 
 const STATUS_PROGRESS: Record<Inventory["status"], number> = {
-  Open: 12,
+  Open: 0,
   "In Progress": 64,
   Closed: 100,
 };

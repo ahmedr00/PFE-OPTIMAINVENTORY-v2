@@ -4,6 +4,10 @@ import { Company } from "../models/company.model.js";
 import { TrialRequest } from "../models/trialRequest.model.js";
 import { User } from "../models/user.model.js";
 import { createNotification } from "./notification.controller.js";
+import {
+  sendCredentialsEmail,
+  sendTrialRequestToSuperAdminEmail,
+} from "../services/email.service.js";
 
 const sanitizeUser = (userDoc) => ({
   ...userDoc,
@@ -37,6 +41,7 @@ export const createTrialRequest = async (req, res) => {
       entityId: request._id,
       href: "/app/companies",
     }).catch(() => undefined);
+    await sendTrialRequestToSuperAdminEmail({ request });
 
     return res.status(201).json({ request });
   } catch (err) {
@@ -96,6 +101,20 @@ export const approveTrialRequest = async (req, res) => {
       password,
       isVerified: true,
     });
+
+    try {
+      await sendCredentialsEmail({
+        to: email,
+        name: adminName,
+        email,
+        password: temporaryPassword,
+        companyName,
+      });
+    } catch (err) {
+      await User.findByIdAndDelete(user._id).catch(() => undefined);
+      await Company.findByIdAndDelete(company._id).catch(() => undefined);
+      return res.status(500).json({ message: err.message || "Could not send approval email" });
+    }
 
     request.status = "approved";
     request.companyId = company._id;

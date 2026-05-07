@@ -10,6 +10,8 @@ Analyse ces statistiques et retourne uniquement un JSON valide:
   "recommendedActions": ["string", "string", "string"]
 }
 
+Mentionne les noms des articles fournis dans articleSamples quand ils existent.
+
 Données:
 ${JSON.stringify(stats, null, 2)}
 `.trim();
@@ -19,13 +21,28 @@ const heuristicInsights = (stats) => {
   const excess = stats?.statusCounts?.excess || 0;
   const conform = stats?.statusCounts?.conform || 0;
   const total = stats?.totals?.articles || 0;
+  const names = (status) =>
+    (stats?.articleSamples?.[status] || [])
+      .slice(0, 4)
+      .map((article) => article.name || article.code)
+      .filter(Boolean)
+      .join(", ");
+  const missingNames = names("missing");
+  const excessNames = names("excess");
+  const conformNames = names("conform");
 
   return {
     summary: `Sur ${total} articles, ${conform} conformes, ${missing} manquants et ${excess} excédents.`,
     topAnomalies: [
-      missing > 0 ? `${missing} articles en manquant détectés.` : "Aucun manquant critique.",
-      excess > 0 ? `${excess} articles en excédent détectés.` : "Aucun excédent significatif.",
-      `Taux de conformité: ${total ? Math.round((conform / total) * 100) : 0}%.`,
+      missing > 0
+        ? `${missing} articles en manquant détectés${missingNames ? `: ${missingNames}` : ""}.`
+        : "Aucun manquant critique.",
+      excess > 0
+        ? `${excess} articles en excédent détectés${excessNames ? `: ${excessNames}` : ""}.`
+        : "Aucun excédent significatif.",
+      conformNames
+        ? `Articles conformes exemples: ${conformNames}.`
+        : `Taux de conformité: ${total ? Math.round((conform / total) * 100) : 0}%.`,
     ],
     recommendedActions: [
       "Prioriser un recomptage des zones avec écarts négatifs.",

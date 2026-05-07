@@ -111,6 +111,11 @@ function App() {
 
   if (checking) return <BootSplash />;
 
+  if (user && publicRoutes.has(route)) {
+    navigate(isCounterRole(user.role) ? "/mobile" : "/app");
+    return <BootSplash />;
+  }
+
   if (route === "landing") {
     return (
       <Suspense fallback={<BootSplash />}>

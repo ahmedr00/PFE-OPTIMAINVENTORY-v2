@@ -11,7 +11,7 @@ const sanitizeUser = (userDoc) => ({
   passwordResetExpiresAt: undefined,
 });
 
-const generateTempPassword = () => crypto.randomBytes(6).toString("base64url");
+const generateTempPassword = () => process.env.DEFAULT_USER_PASSWORD || crypto.randomBytes(6).toString("base64url");
 const counterRoles = ["Compteur", "InventoryPersonnel"];
 const adminCreateRoles = ["CompanyOwner", "InventoryPersonnel"];
 const superAdminCreateRoles = ["SuperAdmin", "CompanyOwner", "InventoryPersonnel"];

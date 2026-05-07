@@ -6,8 +6,10 @@ import { ComparisonResult } from "../models/comparison.model.js";
 import { User } from "../models/user.model.js";
 import { Warehouse } from "../models/warehouse.model.js";
 import { requireCompanyScope } from "../utils/scope.js";
+import { sendInventoryAssignmentEmail } from "../services/email.service.js";
 
 const counterRoles = ["Compteur", "InventoryPersonnel"];
+const defaultUserPassword = () => process.env.DEFAULT_USER_PASSWORD || "123456789";
 
 export const createInventory = async (req, res) => {
   try {
@@ -17,8 +19,9 @@ export const createInventory = async (req, res) => {
     const warehouse = await Warehouse.findOne({ _id: req.body.warehouseId, companyId });
     if (!warehouse) return res.status(400).json({ message: "Invalid warehouse for company" });
 
+    let counter = null;
     if (req.body.assignedCounterId) {
-      const counter = await User.findOne({
+      counter = await User.findOne({
         _id: req.body.assignedCounterId,
         companyId,
         role: { $in: counterRoles },
@@ -34,6 +37,22 @@ export const createInventory = async (req, res) => {
       assignedCounterId: req.body.assignedCounterId || null,
     });
     await inventory.save();
+    if (counter) {
+      try {
+        await sendInventoryAssignmentEmail({
+          to: counter.email,
+          counterName: counter.name,
+          counterEmail: counter.email,
+          password: defaultUserPassword(),
+          inventoryName: inventory.name,
+          warehouseName: warehouse.name,
+          warehouseLocation: warehouse.location,
+        });
+      } catch (err) {
+        await Inventory.findByIdAndDelete(inventory._id).catch(() => undefined);
+        return res.status(500).json({ message: err.message || "Could not send counter assignment email" });
+      }
+    }
     res.status(201).json(inventory);
   } catch (err) {
     res.status(400).json({ error: err.message });

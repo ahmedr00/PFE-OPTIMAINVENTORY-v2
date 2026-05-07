@@ -449,7 +449,7 @@ function InventoryRow({
   const tone =
     status === "Closed" ? "emerald" : status === "In Progress" ? "primary" : "amber";
   const progress =
-    status === "Closed" ? 100 : status === "In Progress" ? 60 : 10;
+    status === "Closed" ? 100 : status === "In Progress" ? 60 : 0;
 
   return (
     <motion.button

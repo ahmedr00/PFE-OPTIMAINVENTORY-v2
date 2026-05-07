@@ -29,6 +29,15 @@ const normalizeComparisonStatus = (comparison) => {
   return "conform";
 };
 
+const pushArticleSample = (samples, status, article, detail = {}) => {
+  if (!article || samples[status].length >= 8) return;
+  samples[status].push({
+    name: article.name,
+    code: article.code,
+    ...detail,
+  });
+};
+
 export const getReportInsights = async (req, res) => {
   try {
     const { warehouseId, inventoryId } = req.query;
@@ -71,6 +80,11 @@ export const getReportInsights = async (req, res) => {
       pending: 0,
       counted: 0,
     };
+    const articleSamples = {
+      conform: [],
+      missing: [],
+      excess: [],
+    };
 
     const varianceTotals = {
       missingQuantity: 0,
@@ -80,10 +94,20 @@ export const getReportInsights = async (req, res) => {
     };
 
     if (comparisons.length) {
+      const articleIds = comparisons.map((comparison) => comparison.articleId);
+      const comparisonArticles = await Article.find({ _id: { $in: articleIds } }).lean();
+      const articleById = new Map(
+        comparisonArticles.map((article) => [article._id.toString(), article]),
+      );
       for (const comparison of comparisons) {
         const status = normalizeComparisonStatus(comparison);
         const diff = (comparison.finalQty || 0) - (comparison.technicalQty || 0);
         statusCounts[status] = (statusCounts[status] || 0) + 1;
+        pushArticleSample(articleSamples, status, articleById.get(comparison.articleId.toString()), {
+          technicalQty: comparison.technicalQty || 0,
+          finalQty: comparison.finalQty || 0,
+          variance: diff,
+        });
         if (diff < 0) varianceTotals.missingQuantity += Math.abs(diff);
         if (diff > 0) varianceTotals.excessQuantity += diff;
         varianceTotals.absoluteVariance += Math.abs(diff);
@@ -107,6 +131,11 @@ export const getReportInsights = async (req, res) => {
         varianceTotals.absoluteVariance += Math.abs(diff);
         varianceTotals.inventoryValueVariance += Math.abs(diff) * (article.unitPrice || 0);
         statusCounts[status] = (statusCounts[status] || 0) + 1;
+        pushArticleSample(articleSamples, status, article, {
+          theoreticalQty: theoretical || 0,
+          countedQty: counted || 0,
+          variance: diff,
+        });
       }
     }
 
@@ -141,6 +170,7 @@ export const getReportInsights = async (req, res) => {
         comparisons: comparisons.length,
       },
       statusCounts,
+      articleSamples,
       varianceTotals,
       source,
       generatedAt: new Date().toISOString(),
